@@ -53,4 +53,10 @@ class _HabitsFormDialogState extends State<HabitsFormDialog> {
       ],
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
