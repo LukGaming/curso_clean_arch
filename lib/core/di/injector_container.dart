@@ -6,7 +6,6 @@ import 'package:curso_clean_arch/feature/habits/domain/usecases/delete_habit_use
 import 'package:curso_clean_arch/feature/habits/domain/usecases/get_habits_usecase.dart';
 import 'package:curso_clean_arch/feature/habits/domain/usecases/insert_habit_usecase.dart';
 import 'package:curso_clean_arch/feature/habits/domain/usecases/update_habit_usecase.dart';
-import 'package:curso_clean_arch/feature/habits/presentation/cubit/delete_habit_cubit.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/habits_cubit.dart';
 import 'package:get_it/get_it.dart';
 
@@ -26,5 +25,4 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton(() => HabitsCubit(sl(), sl(), sl(), sl()));
 
-  sl.registerLazySingleton(() => DeleteHabitCubit(sl()));
 }

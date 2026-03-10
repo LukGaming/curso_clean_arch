@@ -22,19 +22,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final habitsCubit = sl<HabitsCubit>();
-  final deleteCubit = sl<DeleteHabitCubit>();
-  late final StreamSubscription _deleteCubitSubscription;
 
   @override
   void initState() {
     super.initState();
 
     habitsCubit.getHabits();
-    _deleteCubitSubscription = deleteCubit.stream.listen((state) {
-        if(state is SuccessDeletingHabitState){
-          habitsCubit.getHabits();
-        }
-    },);
+   
   }
 
   @override
@@ -51,14 +45,15 @@ class _HomePageState extends State<HomePage> {
             if(state.habits.isEmpty){
               return EmptyHabitViewWidget();
             }
-            return ListHabitsWidget(habits: state.habits);
+            return ListHabitsWidget(habits: state.habits, onDeleteCubit: () {
+              habitsCubit.getHabits();
+            },);
           }
           if (state is HabitsError) {
             return ErrorHabitsViewWidget(error: state.error);
           }
           return SizedBox.shrink();
         },
-        
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -70,11 +65,5 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _deleteCubitSubscription.cancel();
-    super.dispose();
   }
 }
