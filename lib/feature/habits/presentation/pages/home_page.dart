@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:curso_clean_arch/core/di/injector_container.dart';
+import 'package:curso_clean_arch/feature/habits/presentation/cubit/delete_habit_cubit.dart';
+import 'package:curso_clean_arch/feature/habits/presentation/cubit/delete_habit_state.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/habits_cubit.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/habits_state.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/widgets/empty_habit_view_widget.dart';
@@ -18,12 +22,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final habitsCubit = sl<HabitsCubit>();
+  final deleteCubit = sl<DeleteHabitCubit>();
+  late final StreamSubscription _deleteCubitSubscription;
 
   @override
   void initState() {
     super.initState();
 
     habitsCubit.getHabits();
+    _deleteCubitSubscription = deleteCubit.stream.listen((state) {
+        if(state is SuccessDeletingHabitState){
+          habitsCubit.getHabits();
+        }
+    },);
   }
 
   @override
@@ -59,5 +70,11 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _deleteCubitSubscription.cancel();
+    super.dispose();
   }
 }
