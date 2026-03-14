@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:curso_clean_arch/core/di/injector_container.dart';
+import 'package:curso_clean_arch/core/routes/routes.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/delete_habit_cubit.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/delete_habit_state.dart';
 import 'package:curso_clean_arch/feature/habits/presentation/cubit/habits_cubit.dart';
@@ -12,15 +13,16 @@ import 'package:curso_clean_arch/feature/habits/presentation/widgets/list_habits
 import 'package:curso_clean_arch/feature/habits/presentation/widgets/loading_habits_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HabitsPage extends StatefulWidget {
+  const HabitsPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HabitsPage> createState() => _HabitsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HabitsPageState extends State<HabitsPage> {
   final habitsCubit = sl<HabitsCubit>();
 
   @override
@@ -28,7 +30,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     habitsCubit.getHabits();
-   
   }
 
   @override
@@ -42,12 +43,15 @@ class _HomePageState extends State<HomePage> {
             return LoadingHabitsViewWidget();
           }
           if (state is HabitsLoaded) {
-            if(state.habits.isEmpty){
+            if (state.habits.isEmpty) {
               return EmptyHabitViewWidget();
             }
-            return ListHabitsWidget(habits: state.habits, onDeleteCubit: () {
-              habitsCubit.getHabits();
-            },);
+            return ListHabitsWidget(
+              habits: state.habits,
+              onDeleteCubit: () {
+                habitsCubit.getHabits();
+              },
+            );
           }
           if (state is HabitsError) {
             return ErrorHabitsViewWidget(error: state.error);
@@ -57,10 +61,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => HabitsFormDialog(),
-          );
+          context.push(AppRoutes.createHabit);
         },
         child: Icon(Icons.add),
       ),
