@@ -1,8 +1,9 @@
+import 'package:curso_clean_arch/core/result/result.dart';
 import 'package:curso_clean_arch/feature/habits/data/models/habit_model.dart';
 
 abstract class HabitLocalDatasource {
-  Future<void> insertHabit(HabitModel habit);
-  Future<List<HabitModel>> getHabits();
-  Future<void> updateHabit(HabitModel habit);
-  Future<void> deleteHabit(String id);
+  Future<Result<void>> insertHabit(HabitModel habit);
+  Future<Result<List<HabitModel>>> getHabits();
+  Future<Result<void>> updateHabit(HabitModel habit);
+  Future<Result<void>> deleteHabit(String id);
 }

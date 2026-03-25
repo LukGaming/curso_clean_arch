@@ -1,3 +1,4 @@
+import 'package:curso_clean_arch/core/result/result.dart';
 import 'package:curso_clean_arch/feature/habits/data/datasources/habit_local_datasource.dart';
 import 'package:curso_clean_arch/feature/habits/data/models/habit_model.dart';
 import 'package:curso_clean_arch/feature/habits/domain/entities/habit.dart';
@@ -9,24 +10,30 @@ class HabitRepositoryImpl implements HabitRepository {
   const HabitRepositoryImpl(this._dataSource);
 
   @override
-  Future<void> delete(String id) async {
-    await _dataSource.deleteHabit(id);
+  Future<Result<void>> delete(String id) async {
+    return await _dataSource.deleteHabit(id);
   }
 
   @override
-  Future<List<Habit>> get() async {
-    final models = await _dataSource.getHabits();
+  Future<Result<List<Habit>>> get() async {
+    final result = await _dataSource.getHabits();
 
-    return models.map((model) => model.toEntity()).toList();
+    switch (result) {
+      case Success<List<HabitModel>>():
+        final entities = result.value.map((model) => model.toEntity()).toList();
+        return Success(entities);
+      case Error():
+        return Error(result.error);
+    }
   }
 
   @override
-  Future<void> insert(Habit habit) async {
-    await _dataSource.insertHabit(HabitModel.fromEntity(habit));
+  Future<Result<void>> insert(Habit habit) async {
+    return await _dataSource.insertHabit(HabitModel.fromEntity(habit));
   }
 
   @override
-  Future<void> update(Habit habit) async {
-    await _dataSource.updateHabit(HabitModel.fromEntity(habit));
+  Future<Result<void>> update(Habit habit) async {
+    return await _dataSource.updateHabit(HabitModel.fromEntity(habit));
   }
 }
