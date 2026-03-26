@@ -11,3 +11,4 @@ class InsertHabitUseCase {
     return await _repository.insert(habit);
   }
 }
+
