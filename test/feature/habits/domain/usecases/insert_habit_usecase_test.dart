@@ -5,7 +5,7 @@ import 'package:curso_clean_arch/feature/habits/domain/usecases/insert_habit_use
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockHabitRepository extends Mock implements HabitRepository {}
+import '../../../../mocks/repository_mocks.dart';
 
 void main() {
   late HabitRepository habitRepository;
