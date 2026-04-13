@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../mocks/datasource_mocks.dart';
+import '../../../../mocks/models_mocks.dart';
 
 void main() {
   late HabitsCubit habitsCubit;
@@ -24,6 +25,13 @@ void main() {
   late HabitLocalDatasource habitLocalDatasource;
 
   setUpAll(() {
+    registerFallbackValue(
+      HabitModel(
+        id: "first_habit",
+        title: "first_habit",
+        createdAt: DateTime.now(),
+      ),
+    );
     habitLocalDatasource = MockHabitsDataSource();
     habitRepository = HabitRepositoryImpl(habitLocalDatasource);
     insertHabitUseCase = InsertHabitUseCase(habitRepository);
@@ -42,23 +50,10 @@ void main() {
     expect(habitsCubit.state, isA<HabitsInitial>());
   });
 
-  test("Should emit HabitsLoaded", () async {
-    final habitsModel = [
-      HabitModel(
-        id: "first_habit",
-        title: "First Habit",
-        createdAt: DateTime.now(),
-      ),
-      HabitModel(
-        id: "second_habit",
-        title: "Second Habit",
-        createdAt: DateTime.now(),
-      ),
-    ];
-
+  test("Should emit HabitsLoaded after getHabits()", () async {
     when(
       () => habitLocalDatasource.getHabits(),
-    ).thenAnswer((invocation) => Future.value(Success(habitsModel)));
+    ).thenAnswer((invocation) => Future.value(Success(habitsModelMock)));
 
     await habitsCubit.getHabits();
 
@@ -67,5 +62,43 @@ void main() {
     final habits = (habitsCubit.state as HabitsLoaded).habits;
 
     expect(habits.length, 2);
+  });
+
+  test("Should emit HabitsLoaded after insertHabit() ", () async {
+    when(
+      () => habitLocalDatasource.getHabits(),
+    ).thenAnswer((invocation) => Future.value(Success(habitsModelMock)));
+
+    when(
+      () => habitLocalDatasource.insertHabit(any()),
+    ).thenAnswer((invocation) => Future.value(Success(null)));
+
+    expectLater(
+      habitsCubit.stream,
+      emitsInOrder([isA<HabitsLoading>(), isA<HabitsLoaded>()]),
+    );
+
+    await habitsCubit.insertHabit("My First Habit");
+  });
+
+  test("Should emit HabitsLoaded after insertHabit", () async {
+    when(
+      () => habitLocalDatasource.getHabits(),
+    ).thenAnswer((invocation) => Future.value(Success(habitsModelMock)));
+
+    when(
+      () => habitLocalDatasource.updateHabit(any()),
+    ).thenAnswer((invocation) => Future.value(Success(null)));
+
+    expectLater(
+      habitsCubit.stream,
+      emitsInOrder([isA<HabitsLoading>(), isA<HabitsLoaded>()]),
+    );
+
+    await habitsCubit.getHabits();
+
+    final habitToEdit = (habitsCubit.state as HabitsLoaded).habits.first;
+
+    await habitsCubit.editHabit(habitToEdit.copyWith(title: "Novo título"));
   });
 }
